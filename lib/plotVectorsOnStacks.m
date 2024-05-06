@@ -19,7 +19,7 @@ if size(imstack,3) > 1
     addlistener(sv,'SliderValueChanged',@allevents);
 elseif size(imstack,3) == 1
     
-    imagesc(imstack,'Parent',gca(hfig));
+    imagesc(imstack,'Parent',gca(hfig));colormap gray;
     hold on;
     quiver(vectors.pos(:,1),vectors.pos(:,2),vectors.vec(:,1),vectors.vec(:,2),scale,'r');
 end
