@@ -383,13 +383,19 @@ while processing
                 else
                     visual_range = [1:refNumber3-1,refNumber3+1:nframes];
                 end
-                input_data.displacement(refNumber3) = [];
-            elseif nframes == 2
-                visual_range = 1:2;
                 
+            elseif nframes == 2
+                if refNumber3 == 1
+                    visual_range = 2;
+                elseif refNumber3 == 2
+                    visual_range =1;
+                else
+                    error("Erro in reference frame selcetion, should be in the range of the number of frames");
+                end
             else
                 error("Frame number is less than 1, error in LINE 388 of TFM_main script");    
             end
+            input_data.displacement(refNumber3) = [];
             
             
             plotVectorsOnStacks(imstack_filtered(:,:,visual_range),input_data.displacement,hview5,scale_disp);
