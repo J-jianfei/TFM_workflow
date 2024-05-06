@@ -581,10 +581,10 @@ function preview_Callback(hObject, eventdata, handles)
     cla; hold on; colormap(gca,jet);
     fnorm = (f_mat(:,:,2).^2 + f_mat(:,:,1).^2).^0.5;
     surf(grid_mat(:,:,1), grid_mat(:,:,2),fnorm),view(0,90),shading interp, axis equal;
-    set(gca, 'DataAspectRatio', [1,1,50],'YDir','reverse','XTick',[],'YTick',[],'YColor','w','XColor','w');
+    set(gca, 'DataAspectRatio', [1,1,50],'YDir','reverse','XTick',[],'YTick',[],'YColor','black','XColor','black');
     hilf = get(handles.showColorbar,'Value');
     if hilf
-        colorbar('location','East','YColor','w','XColor','w');
+        colorbar('location','East','YColor','r','XColor','r');
     end
     hold off;
 
@@ -635,7 +635,7 @@ function showColorbar_Callback(hObject, eventdata, handles)
 axes(handles.axes3);
 if (get(hObject,'Value') == get(hObject,'Max'))
     hold on;
-    colorbar('location','East','YColor','w','XColor','w');
+    colorbar('location','East','YColor','r','XColor','r');
     hold off;
 else
     colorbar off;

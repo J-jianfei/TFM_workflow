@@ -198,7 +198,7 @@ while processing
         
 
             for i = 1:nframes
-                imstack_aligned_cropped(:,:,i) = imcrop(imstack_aligned(:,:,i), roi2);
+                imstack_aligned_cropped(:,:,i) = imcrop(imstack_aligned(:,:,i), [roi2(1) roi2(2) roi2(4) roi2(3)]);
             end
 
 
@@ -369,7 +369,7 @@ while processing
             release(tracker);
             disp('tracking displacement completed')
             % Display the tracked points
-            clearvars points point2 valid d
+            
             ask_scale = inputdlg('Enter a scale factor to visualize tracking results', ...
                 'Scale for preview displacement fields',[1 50],{'1'});
             scale_disp = str2double(ask_scale{1});
@@ -417,7 +417,9 @@ while processing
             settings.maxBidirectionalError = maxBidirectionalError;
             settings.blockSize = blksz;
             settings.numPyramidLevels = numPyramidLevels;
-
+            if ~strcmpi(status,'pointTracking')
+                clearvars points point2 valid d
+            end
         case 'tractionCalculation'
             % Ask for user inputs for traction calculation
             disp('start calculate tracion, creating a temporary folder...');
