@@ -111,7 +111,7 @@ while processing
             disp('start loading image')
             % Load the data
             [filename, pathname] = uigetfile('*.tif*', 'Select the data file');
-            if filename == 0
+            if isequal(filename,0)
                 fprintf('No file selected. Please try again. \n');
                 status = 'loadImg';
                 break;
@@ -172,7 +172,7 @@ while processing
 
             if ~exist('imstack_aligned','var')
                 [filename, pathname] = uigetfile('*.tif*', 'Select the data file');
-                if filename == 0
+                if isequal(filename,0)
                     fprintf('No file selected. Please try again. \n');
                     status = 'loadImg';
                     break;
@@ -222,7 +222,7 @@ while processing
             % Enhance contrast
             if ~exist("imstack_aligned_cropped","var")
                 [filename, pathname] = uigetfile('*.tif*', 'Select the data file');
-                if filename == 0
+                if isequal(filename,0)
                     fprintf('No file selected. Please try again. \n');
                     status = 'loadImg';
                     break;
@@ -275,7 +275,7 @@ while processing
             
             if ~exist("imstack_filtered","var")
                 [filename, pathname] = uigetfile('*.tif*', 'Select the data file');
-                if filename == 0
+                if isequal(filename,0)
                     fprintf('No file selected. Please try again. \n');
                     status = 'loadImg';
                     break;
@@ -472,7 +472,7 @@ while processing
             savefullname = fullfile(pathname,strcat(filename(1:end-4),'_TFM_output.mat'));
             % Save the data
             [savefilename, savepathname] = uiputfile(savefullname, 'Save the data');
-            if savefilename == 0
+            if isequal(savefilename,0)
                 fprintf('No file selected. Please Enter filename manually. \n');
                 status = 'saveData';
                 break;
