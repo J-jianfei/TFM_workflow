@@ -68,7 +68,7 @@ function varargout = findMaxTractionMagnitude(varargin)
 
 
     [savename,savepath] = uiputfile('*.txt','Save the results');
-    if ~exist(fullfile(savename,savename),'file')
+    if ~exist(fullfile(savepath,savename),'file')
         fileID = fopen(fullfile(savepath,savename),'w');
         fprintf(fileID,'Data filename, Maximum traction magnitude (Pa), x position (pix), y position (pix), frame, attemptId, TF method\n');
         fprintf(fileID,'%s, %f, %f, %f, %d, %d, %s \n',filenameWithoutSuffix,maxTmag,posmax(1),posmax(2),iframe,j,method);
