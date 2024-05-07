@@ -104,7 +104,7 @@ while processing
                 if ~exist(fullfile(savepath,savename),'file')
                     fileID = fopen(fullfile(savepath,savename),'w');
                     fprintf(fileID,"Data filename, Maximum traction magnitude fnmax (Pa), fnmax position x (pix), fnmax position y (pix), fnmax frame," ...
-                        + "average traction magnitude fnavg, variance of traction magnitude fnvar, strain energy, average strain energy density," ...
+                        + "average traction magnitude fnavg (Pa), variance of traction magnitude fnvar (Pa^2), strain energy (muJ), average strain energy density (muJ/pix^2)," ...
                         + "attemptId, TF method\n");
                     checkvarexistance();
                     j = attemptId;
@@ -156,7 +156,7 @@ end
         end
     end
 
-    function avg_mag = getAvgMagROI();
+    function avg_mag = getAvgMagROI()
         if iframe == 0
             avg_mag = mean(traction_magnitude_roi);
         else
@@ -164,7 +164,7 @@ end
         end
     end
 
-    function var_mag = getVarMagROI();
+    function var_mag = getVarMagROI()
         if iframe == 0
             var_mag = var(traction_magnitude_roi);
         else
