@@ -1,4 +1,3 @@
-*.tif
-*.mat
+/* 
 !*.m
-!.gitignore
+!/lib/*

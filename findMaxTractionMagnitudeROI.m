@@ -80,6 +80,13 @@ function varargout = findMaxTractionMagnitudeROI(varargin)
         if (~isempty(TF_attempt.Regularized))
             TFM_results = TF_attempt.Regularized(j).TFM_results;
             for frame = 1:length(TFM_results)
+                if ~exist("roi","var") 
+                    x1 = min(TFM_results(frame).pos(:,1));
+                    y1 = min(TFM_results(frame).pos(:,2));
+                    x2 = max(TFM_results(frame).pos(:,1));
+                    y2 = max(TFM_results(frame).pos(:,2));
+                    roi = [x1 y1; x2 y1; x2 y2; x1 y2];
+                end
                 traction_magnitude = TFM_results(frame).traction_magnitude;
                 in_id = find(inpolygon(TFM_results(frame).pos(:,1),TFM_results(frame).pos(:,2),roi(:,1),roi(:,2)));
                 [maxTmagAtFrametmp(frame),idxtmp] = max(traction_magnitude(in_id));
