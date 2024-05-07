@@ -11,7 +11,8 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
 
     manual_selection = 0;
     saveROI = 0;
-
+    filenameWithoutSuffix = extractBefore(filename, '_TFM_output');
+    fprintf("Loaded data file name: %s \n",filenameWithoutSuffix);
     
     [imcellname,imcellpath] = uigetfile('*.tif','Select the Cell image(.tif) to select ROI for maximum traction finding');
     if ~exist(fullfile(imcellpath,imcellname), 'file') || isequal(imcellname, 0)
@@ -20,7 +21,11 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
         manual_selection = 1;
         imcell = imread(fullfile(imcellpath,imcellname));
         h = figure;
-        imshow(imadjust(mat2gray(imcell)),'Parent',gca(h)); colormap gray;
+        if length(size(imcell)) == 2 % grayscale
+            imshow(imadjust(mat2gray(imcell)),'Parent',gca(h)); colormap gray;
+        elseif length(size(imcell)) == 3 % rgb
+            imshow(imcell,'Parent',gca(h))
+        end
         % Enable rectangle tool for ROI selection
         % Enable polygon tool for ROI selection
         poly = drawpolygon;
@@ -42,7 +47,7 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
     end
 
 
-    filenameWithoutSuffix = extractBefore(filename, '_TFM_output');
+    
     prompt = {'Specify the method from which the result are obtained and you want to analyze (B for Bayesian, R for Regularized)', ...
     'Specify the attempt index if you have multiple attempts on that method', ...
     'Specify the frame number for which you want to find the traction magnitudes (0 for finding the magnitudes over all frames)'};

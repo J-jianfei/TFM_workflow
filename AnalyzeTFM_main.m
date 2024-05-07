@@ -15,21 +15,20 @@ fprintf("Please follow the instructions in the command window to proceed.");
 
 processing = true;
 status = 'idle';
-
-
-
-while processing
-
-    switch status
-        case 'idle'
-            fprintf("Command line instructions: \n" + ...
+fprintf("Command line instructions: \n" + ...
                 "findmaxmag -> find max traction magnitude within a given ROI\n" + ...
                 "findavgmag -> find avg traction magnitude within a given ROI\n" + ...
                 "findall -> find all basic analysis results (This is the Default Entry)\n" + ...
                 "findvarmag -> find variance of traction magnitude within a given ROI\n" + ...
                 "finenergy -> find strain energy in the entire region\n" + ...
                 "exit(q) -> exit the program\n");
-            prompt = 'Please choose which data you want to compare: ';
+
+
+while processing
+
+    switch status
+        case 'idle'
+            prompt = 'Please type a command: ';
             userInput = input(prompt, 's');
             switch userInput
                 case 'findmaxmag'
@@ -53,10 +52,12 @@ while processing
             if ismember(status, {'getMaxMagROI','getAvgMagROI','getVarMagROI','getStrainEnergy','all'})
                 % load data
                 [traction_magnitude_selected,roi,energy,avg_energy_density,method,nframes,data_filename_pattern,attemptId] = findTractionMagnitudeROI();
+                %fprintf("Loaded filename: %s \n",data_filename_pattern);
                 frameId = traction_magnitude_selected(:,1);
                 traction_magnitude_roi = traction_magnitude_selected(:,2);
                 x_roi = traction_magnitude_selected(:,3);
                 y_roi = traction_magnitude_selected(:,4);
+                avg_energy_density = avg_energy_density * 10^9;
                 if nframes > 1
                     fprintf("Multiple frames are detected. Please specify the frame number you want to analyze.\n");
                     userFrame = input("Enter a frame number (0 means all frames)",'s');
@@ -104,7 +105,7 @@ while processing
                 if ~exist(fullfile(savepath,savename),'file')
                     fileID = fopen(fullfile(savepath,savename),'w');
                     fprintf(fileID,"Data filename, Maximum traction magnitude fnmax (Pa), fnmax position x (pix), fnmax position y (pix), fnmax frame," ...
-                        + "average traction magnitude fnavg (Pa), variance of traction magnitude fnvar (Pa^2), strain energy (muJ), average strain energy density (muJ/pix^2)," ...
+                        + "average traction magnitude fnavg (Pa), variance of traction magnitude fnvar (Pa^2), strain energy (muJ), average strain energy density (10^-muJ/pix^2)," ...
                         + "attemptId, TF method\n");
                     checkvarexistance();
                     j = attemptId;
@@ -122,14 +123,14 @@ while processing
                         frame_max_first,avg_mag,var_mag,se,se_density,j,method);
                 end
 
-                fclose(fileID);
-                status = 'idle';
+                fclose(fileID);  
             end
+                status = 'idle';
+                close('all');
 
 
 
         case 'exit'
-            close('all')
             processing = false;
     end
 
