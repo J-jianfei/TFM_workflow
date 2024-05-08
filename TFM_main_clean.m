@@ -25,10 +25,9 @@ process_status = {'loadImg','correctDrift','cropImage','enhanceContrast','pointD
 
 nrows = 0; ncols = 0; nframes = 0;
 
-%% ask user about image conditions: aligned, aligned&cropped, enhanced(filtered), or raw
-
-imgCondition = askInputImageCondition();
-
+lastDefaultImgCondition = {};
+lastDefaultReferenceForDriftCorrection = 1;
+settings = struct;
 %% main processing loop, capable for processing multiple files manually, no need to exit the script.
 % However, batch processing is not supported yet.
 
@@ -60,10 +59,59 @@ while true
             status = 'correctDrift';
 
         case 'correctDrift'
-            [status,roi] = driftCorrection();
+            [imstack_aligned,status,roi_driftcorrection,...
+                lastDefaultReferenceForDriftCorrection] = driftCorrection(lastDefaultReferenceForDriftCorrection);
+            settings.driftCorrectionROI = roi_driftcorrection;
+        case 'cropImage' 
+            % crop images to exclude potental black boarders due to alignment
+            % if the drift is too large
+            % check existance of aligned images, if not, meaning that the 
+            % user wants to import aligned images from the folder by
+            % previous imgCondition check.
+            if ~exist('imstack_aligned','var')
+                [filename, pathname] = uigetfile('*.tif*', 'Select the data file');
+                if isequal(filename,0)
+                    fprintf('No file selected. Please try again. \n');
+                    status = 'loadImg';
+                    continue;
+                end
+                imstack = tiffreadVolume(fullfile(pathname, filename));
+                nframes = size(imstack,3);
+                ncols = size(imstack,2);
+                nrows = size(imstack,1);
+                for i = 1:size(imstack,3)
+                    imstack_aligned(:,:,i) = imadjust(mat2gray(imstack(:,:,i)));
+                end
+                clearvar imstack;
+            end
+            
 
-        case 'cropImage'
+            [imstack_aligned_cropped,status,roi_crop] = cropAlignedImstack();
+
+
+            settings.cropROI = roi_crop;
+
+
         case 'enhanceContrast'
+            % check existance of previously processed data
+            if ~exist("imstack_aligned_cropped","var")
+                [filename, pathname] = uigetfile('*.tif*', 'Select the data file');
+                if isequal(filename,0)
+                    fprintf('No file selected. Please try again. \n');
+                    status = 'loadImg';
+                    break;
+                end
+                imstack = tiffreadVolume(fullfile(pathname, filename));
+                nframes = size(imstack,3);
+                ncols = size(imstack,2);
+                nrows = size(imstack,1);
+                for i = 1:size(imstack,3)
+                    imstack_aligned_cropped(:,:,i) = imadjust(mat2gray(imstack(:,:,i)));
+                end
+                clearvars imstack;
+            end
+
+
         case 'pointDetection'
         case 'pointTracking'
         case 'tractionCalculation'
@@ -75,17 +123,23 @@ end
 
 
 
-    function imgCondition = askInputImageCondition()
+    function [imgCondition,newDefault] = askInputImageCondition(defaultImgCondition)
         
         prompt = {'Is the image stack algined?', 'Is the image stack aligned and cropped?',...
             'Is the image stack enhanced?'};
         dlgtitle = 'Does the image stack fulfill the requirements? (1 for yes, 0 for no)';
         dims = [1 100];
-        default = {'1', '1','1','1'};
+        if nargin == 0 || isempty(defaultImgCondition)
+            default = {'1', '1','1','1'};
+        else
+            default = defaultImgCondition;
+        end
         userInput = inputdlg(prompt, dlgtitle,dims,default);
         isAligned = str2double(userInput{1});
         isCropped = str2double(userInput{2});
         isEnhanced = str2double(userInput{3});
+        
+        newDefault = userInput;
         
         if isAligned == 1 && isCropped == 1 && isEnhanced == 1
             imgCondition = 'Enhanced';
@@ -107,6 +161,9 @@ end
             'continue (c): continue from where you left due to invalid commands \n']);
         userInput = input('Waiting for user command: ', 's');
         if strcmpi(userInput, 'start') || strcmpi(userInput,'s')
+                %% ask user about image conditions: aligned, aligned&cropped, enhanced(filtered), or raw
+
+            [imgCondition,lastDefaultImgCondition] = askInputImageCondition(lastDefaultImgCondition);
             switch imgCondition
                 case 'Raw'
                     fprintf('The image stack is raw. Please align the image stack first. \n');
@@ -154,11 +211,13 @@ end
     end
 
     
-    function [nextStatus,roi] = driftCorrection()
+    function [imstack_aligned,nextStatus,roi,newDefault] = driftCorrection(defaultReferenceForDriftCorrection)
         disp('start drift correction')
         if length(size(imstack_raw)) > 3
             fprintf("The image stack has more than 3 dimensions. Please select a 3D image stack. \n");
             nextStatus = 'loadImg';
+            imstack_aligned = [];
+            newDefault = [];
             roi = [];
             return;
         end
@@ -166,27 +225,41 @@ end
         ncols = size(imstack_raw,2);
         nframes = size(imstack_raw,3);
         % normalize the brightness
-        for i = 1:nframes
-            imstack(:,:,i) = imadjust(mat2gray(imstack_raw(:,:,i)));
+        for iframe = 1:nframes
+            imstacktmp(:,:,iframe) = imadjust(mat2gray(imstack_raw(:,:,iframe)));
         end
 
         % Ask for user inputs
-        prompt = {'Enter the reference number:', 'Enter the ROI (x,y,w,h):'};
-        dlgtitle = 'User Inputs for Drift Correction';
+        prompt = {'Enter the reference number:'};
+        dlgtitle = 'Which frame is the reference for drift correction';
         dims = [1 100];
-        defroi = strcat(num2str(1),',',num2str(1),',',num2str(ncols),',',num2str(nrows));
-        default = {'1', defroi};
-        userInputs1 = inputdlg(prompt, dlgtitle, dims, default);
+        if isempty(defaultReferenceForDriftCorrection) || ...
+                defaultReferenceForDriftCorrection == 0 || nargin == 0
+            default = {'1'};
+        else
+            default = {num2str(defaultReferenceForDriftCorrection)};
+        end
+        userInputs = inputdlg(prompt, dlgtitle, dims, default);
 
         % Process the user inputs
-        refNumber1 = str2double(userInputs1{1});
-        roi = str2double(strsplit(userInputs1{2}, {' ', ',', ';'}));
-        roi = roi(:)';
+        refNumber = str2double(userInputs{1});
+        
+        
 
-        drift = computeDrift(imstack, refNumber1, roi1);
+
+        % enable drawing in a preview window
+        hpreview = figure; sliceViewer(imstacktmp);
+        % press return to confirm selection; press backspace to redo the
+        % selection
+        [roi,~,~] = waitROISelection('rectangle','return','backspace',hpreview,[1,1,ncols-1,nrows-1]); 
+
+
+        drift = computeDrift(imstacktmp, refNumber, roi);
         disp('drift calculation finished...')
-        imstack_aligned = translateImgStack(imstack, drift);
+        imstack_aligned = translateImgStack(imstacktmp, drift);
         disp('correction completed')
+        close(hpreview);
+
         hview = figure;
         sliceViewer(imstack_aligned);
         
@@ -201,6 +274,119 @@ end
         if isvalid(hview)
             close(hview);
         end
+
+        newDefault = refNumber;
     end
+
+    function [imstack_aligned_cropped,nextStatus,roi] = cropAlignedImstack()
+        
+        % preview previously aligned image stack to select cropping roi
+        hpreview = figure;
+        sliceViewer(imstack_aligned);
+        [roi,useFOV,~] = waitROISelection('rectangle','return','backspace',hpreview,[1,1,ncols-1,nrows-1]); 
+        
+        % if no rectangular roi is selected, no need to crop.
+        if useFOV == 1
+            imstack_aligned_cropped = imstack_aligned;
+        else
+            for iframe = 1:nframes
+                imstack_aligned_cropped(:,:,iframe) = imcrop(imstack_aligned(:,:,iframe), [roi2(1) roi2(2) roi2(4) roi2(3)]);
+            end
+        end
+
+        
+        % preview of cropped image stack
+        hview = figure;
+        sliceViewer(imstack_aligned_cropped);
+
+        userDecision = input('Type continue to proceed, redo to redo cropping: ', 's');
+        if strcmpi(userDecision, 'continue') || strcmpi(userDecision,'c')
+            nextStatus = 'enhanceContrast';
+        elseif strcmpi(userDecision, 'redo') || strcmpi(userDecision,'r')
+            nextStatus = 'cropImage';
+        else
+            fprintf('Invalid input. Please try again. \n');
+            nextStatus = 'idle';
+        end
+        if isvalid(hview)
+            close(hview);
+        end
+        
+    end
+
+    
+
+
+
+end
+
+function [roi,useFOV,errorcode] = waitROISelection(roiType,keyconfirm,keyrechoose,fig,varargin)
+   
+    
+    if ~strcmpi(roiType,'rectangle') && ~strcmpi(roiType,'rect') && ...
+            ~strcmpi(roiType,'polygon') && ~strcmpi(roiType,'poly')
+        fprintf("Unrecognized ROI type, first input argument error. \n")
+        errorcode = 1;
+        roi = [];
+        useFOV = 0;
+        return;
+    end
+    
+     % first by default the entire region is roi
+    if length(varargin) == 1  
+        default = varargin{1};
+        roiObj = drawrectangle('Position',default);
+    end
+
+   
+
+
+while true
+    if strcmpi(roiType,'rectangle') || strcmpi(roiType,'rect')
+        
+        isconfirm = checkConfirm();
+        if(isconfirm == 1)
+            roi = roiObj.Position;
+            errorcode = 0;
+            break;
+        else
+            delete(roiObj); % re-selection
+            roiObj = drawrectangle;
+        end
+    elseif strcmpi(roiType,'polygon') || strcmpi(roiType,'poly')
+        isconfirm = checkConfirm();
+        if(isconfirm == 1)
+            roi = roiObj.Position;
+            errorcode = 0;
+            break;
+        else
+            delete(roiObj); % re-selection
+            roiObj = drawpolygon;
+        end
+    end
+end
+
+if ~exist("default","var")
+    useFOV = 0;
+else
+    if isequal(roi,default)
+        useFOV = 1;
+    end
+end
+
+    function confirmed = checkConfirm()
+        while true
+            waitforbuttonpress;
+            key = get(fig,'CurrentKey');
+            if strcmpi(key,keyconfirm)
+                confirmed = 1;
+                break;
+            elseif strcmpi(key,keyrechoose)
+                confirmed = 0;
+                break
+            end
+        end
+    end
+
 
 end
