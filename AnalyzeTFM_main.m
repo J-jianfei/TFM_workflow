@@ -60,7 +60,7 @@ while processing
                 avg_energy_density = avg_energy_density * 10^9;
                 if nframes > 1
                     fprintf("Multiple frames are detected. Please specify the frame number you want to analyze.\n");
-                    userFrame = input("Enter a frame number (0 means all frames)",'s');
+                    userFrame = input("Enter a frame number (0 means all frames) ",'s');
                     iframe = str2double(userFrame);
                 else
                     iframe = 1;
@@ -105,7 +105,7 @@ while processing
                 if ~exist(fullfile(savepath,savename),'file')
                     fileID = fopen(fullfile(savepath,savename),'w');
                     fprintf(fileID,"Data filename, Maximum traction magnitude fnmax (Pa), fnmax position x (pix), fnmax position y (pix), fnmax frame," ...
-                        + "average traction magnitude fnavg (Pa), variance of traction magnitude fnvar (Pa^2), strain energy (muJ), average strain energy density (10^-muJ/pix^2)," ...
+                        + "average traction magnitude fnavg (Pa), variance of traction magnitude fnvar (Pa^2), strain energy (muJ), average strain energy density (10^-9 muJ/pix^2)," ...
                         + "attemptId, TF method\n");
                     checkvarexistance();
                     j = attemptId;

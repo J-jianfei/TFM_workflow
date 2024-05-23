@@ -28,18 +28,7 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
         end
         % Enable rectangle tool for ROI selection
         % Enable polygon tool for ROI selection
-        poly = drawpolygon;
-
-        click1 = waitforbuttonpress;
-        click2 = waitforbuttonpress;
-        fprintf('double click to confirm ROI selection and calculation will start automatically \n')
-        if(click1 == 0 && click2 == 0)
-            disp('Polygonal ROI is seleted');
-        end
-       
-
-        % Get the final position of the polygon
-        roi = poly.Position;
+         [roi,~,~] = waitROISelection('polygon','return','backspace',h); 
         issave = questdlg('Do you want to save the ROI?','Save ROI','Yes','No','Yes');
         if strcmp(issave,'Yes')
             saveROI = 1;
@@ -63,7 +52,7 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
     if strcmpi(method,'Bayesian') || strcmpi(method,'Bay') || strcmpi(method,'B')
         if (~isempty(TF_attempt.Bayesian))
             TFM_results = TF_attempt.Bayesian(j).TFM_results;
-            nframes = length(TFM_results)
+            nframes = length(TFM_results);
                 for frame = 1:length(TFM_results)
                     x1 = min(TFM_results(frame).pos(:,1));
                     y1 = min(TFM_results(frame).pos(:,2));
