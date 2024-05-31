@@ -1,3 +1,4 @@
 /* 
 !*.m
 !/lib/*
+!/lab_utils/*.m
