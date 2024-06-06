@@ -10,19 +10,18 @@ function [roi,useFOV,errorcode,roiObj] = waitROISelection(roiType,keyconfirm,key
         return;
     end
     
-     % first by default the entire region is roi
-    if isscalar(varargin)  
+    % first by default the entire region is roi
+    if isscalar(varargin)
         default = varargin{1};
         roiObj = drawrectangle('Position',default);
-    end
-    
+    else
+        if strcmpi(roiType,'polygon') || strcmpi(roiType,'poly')
+            roiObj = drawpolygon;
+        end
 
-    if strcmpi(roiType,'polygon') || strcmpi(roiType,'poly')
-        roiObj = drawpolygon;
-    end
-
-    if strcmpi(roiType,'rectangle') || strcmpi(roiType,'rect')
-         roiObj = drawrectangle;
+        if strcmpi(roiType,'rectangle') || strcmpi(roiType,'rect')
+            roiObj = drawrectangle;
+        end
     end
 
 
