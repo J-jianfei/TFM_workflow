@@ -47,6 +47,15 @@ while true
         framesToCrop = askCroppingFrames();
         imbead_cropped = crop_stack(imbead,roi,framesToCrop);
         
+        h2 = figure;
+        sv2 = sliceViewer(imbead_cropped,"Parent",h2);
+        isconfirmed = checkKeyInFig(h2,'return','backspace');
+        if(isvalid(h2))
+            close(h2)
+        end
+        if(~isconfirmed)
+            continue;
+        end
 
 
         fullname_noext = fullname(1:strfind(fullname,'.tif')-1);
@@ -163,5 +172,25 @@ function imstack_cropped = crop_stack(imstack,rect,frames)
 nframes = length(frames);
 for i = 1:nframes
     imstack_cropped(:,:,i) = imcrop(imstack(:,:,frames(i)),rect);
+end
+end
+
+function confirmed = checkKeyInFig(fig,keyyes,keyno)
+while true
+    if(~isvalid(fig))
+        confirmed = 0;
+        break;
+    end
+
+    if (waitforbuttonpress)
+        key = get(fig,'CurrentKey');
+        if strcmpi(key,keyyes)
+            confirmed = 1;
+            break;
+        elseif strcmpi(key,keyno)
+            confirmed = 0;
+            break;
+        end
+    end
 end
 end
