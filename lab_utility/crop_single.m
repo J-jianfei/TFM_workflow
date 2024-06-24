@@ -49,6 +49,7 @@ while true
         
         h2 = figure;
         sv2 = sliceViewer(imbead_cropped,"Parent",h2);
+        disp("When the cursor is in figure 2, press ENTER to confirm, DEL to discard");
         isconfirmed = checkKeyInFig(h2,'return','backspace');
         if(isvalid(h2))
             close(h2)
