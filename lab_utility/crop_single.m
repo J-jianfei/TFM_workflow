@@ -177,7 +177,7 @@ end
 
 function confirmed = checkKeyInFig(fig,keyyes,keyno)
 while true
-    fig.CloseRequestFcn=@(src,event) set(src,'UserData',strcut('figureClosed',true));
+    fig.CloseRequestFcn=@(src,event) set(src,'UserData',struct('figureClosed',true));
 
     if(fig.UserData.figureClosed)
         confirmed = 0;
