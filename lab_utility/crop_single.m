@@ -176,14 +176,7 @@ end
 end
 
 function confirmed = checkKeyInFig(fig,keyyes,keyno)
-while true
-    fig.CloseRequestFcn=@(src,event) set(src,'UserData',struct('figureClosed',true));
-
-    if(fig.UserData.figureClosed)
-        confirmed = 0;
-        break;
-    end
-
+while true 
     if (waitforbuttonpress)
         key = get(fig,'CurrentKey');
         if strcmpi(key,keyyes)
