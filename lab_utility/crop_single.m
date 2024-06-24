@@ -55,6 +55,7 @@ while true
             close(h2)
         end
         if(~isconfirmed)
+            delete(roiObj);
             continue;
         end
 
