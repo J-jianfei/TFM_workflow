@@ -51,7 +51,7 @@ while processing
             end
             if ismember(status, {'getMaxMagROI','getAvgMagROI','getVarMagROI','getStrainEnergy','all'})
                 % load data
-                [traction_magnitude_selected,roi,energy,avg_energy_density,method,nframes,data_filename_pattern,attemptId] = findTractionMagnitudeROI();
+                [traction_magnitude_selected,roi,energy,avg_energy_density,method,nframes,data_filename_pattern,attemptId,data_file_folder] = findTractionMagnitudeROI();
                 %fprintf("Loaded filename: %s \n",data_filename_pattern);
                 frameId = traction_magnitude_selected(:,1);
                 traction_magnitude_roi = traction_magnitude_selected(:,2);
@@ -106,21 +106,21 @@ while processing
                     fileID = fopen(fullfile(savepath,savename),'w');
                     fprintf(fileID,"Data filename, Maximum traction magnitude fnmax (Pa), fnmax position x (pix), fnmax position y (pix), fnmax frame," ...
                         + "average traction magnitude fnavg (Pa), variance of traction magnitude fnvar (Pa^2), strain energy (muJ), average strain energy density (10^-9 muJ/pix^2)," ...
-                        + "attemptId, TF method\n");
+                        + "attemptId, TF method, Source folder \n");
                     checkvarexistance();
                     j = attemptId;
 
-                    fprintf(fileID,"%s, %f, %f, %f, %d, %f, %f, %f, %f ,%d, %s \n", ...
+                    fprintf(fileID,"%s, %f, %f, %f, %d, %f, %f, %f, %f ,%d, %s, %s \n", ...
                         data_filename_pattern,max_mag_first,pos_max_first(1),pos_max_first(2),...
-                        frame_max_first,avg_mag,var_mag,se,se_density,j,method);
+                        frame_max_first,avg_mag,var_mag,se,se_density,j,method,data_file_folder);
 
                 else
                     fileID = fopen(fullfile(savepath,savename),'a');
                     checkvarexistance();
                     j = attemptId;
-                    fprintf(fileID,"%s, %f, %f, %f, %d, %f, %f, %f, %f ,%d, %s \n", ...
+                    fprintf(fileID,"%s, %f, %f, %f, %d, %f, %f, %f, %f ,%d, %s, %s \n", ...
                         data_filename_pattern,max_mag_first,pos_max_first(1),pos_max_first(2),...
-                        frame_max_first,avg_mag,var_mag,se,se_density,j,method);
+                        frame_max_first,avg_mag,var_mag,se,se_density,j,method,data_file_folder);
                 end
 
                 fclose(fileID);  

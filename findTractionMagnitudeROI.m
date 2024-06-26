@@ -1,4 +1,4 @@
-function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nframes,data_filename_pattern,j] = findTractionMagnitudeROI(varargin)
+function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nframes,data_filename_pattern,j,data_file_folder] = findTractionMagnitudeROI(varargin)
     % traction_magnitude_selected follows the structure
     % frameID, traction_magnitude, x, y,
     % roi follows the structure
@@ -8,6 +8,9 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
 
     [filename,path] = uigetfile('*.mat','Select the TFM output file from TFM_main script');
     load(fullfile(path,filename),"TF_attempt");
+    load(fullfile(path,filename),"TF_input");
+
+    crop_roi = TF_input.settings.cropROI;
 
     manual_selection = 0;
     saveROI = 0;
@@ -20,6 +23,7 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
     else
         manual_selection = 1;
         imcell = imread(fullfile(imcellpath,imcellname));
+        imcell = imcrop(imcell,crop_roi);
         h = figure;
         if length(size(imcell)) == 2 % grayscale
             imshow(imadjust(mat2gray(imcell)),'Parent',gca(h)); colormap gray;
@@ -100,7 +104,7 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
     end
 
     data_filename_pattern = filenameWithoutSuffix;
-
+    data_file_folder = path;
     if(manual_selection && saveROI)
         
         roi_filename = strcat(filenameWithoutSuffix, "_ROI.txt");
