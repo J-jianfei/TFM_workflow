@@ -7,7 +7,7 @@ end
 nframe = size(imstack,3);
 
 for i = 1:nframe
-    imstack_new(:,:,i) = imtranslate(imstack(:,:,i),drift(i,:));
+    imstack_new(:,:,i) = imtranslate(imstack(:,:,i),drift(i,:),'cubic');
 end
 
 

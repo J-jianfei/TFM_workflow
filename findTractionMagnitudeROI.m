@@ -22,7 +22,15 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
         fprintf('No image is selected, will try to use the entire region \n');
     else
         manual_selection = 1;
-        imcell = imread(fullfile(imcellpath,imcellname));
+        imcell = tiffreadVolume(fullfile(imcellpath,imcellname));
+        if(length(size(imcell))==3)
+            imcell = imcell(:,:,2);
+        elseif(length(size(imcell))>3)
+            error("cell image has too many dimensions!");
+        elseif(length(size(imcell))<2)
+            error("cell image has too less dimensions!");
+        end
+        % imread(fullfile(imcellpath,imcellname));
         imcell = imcrop(imcell,crop_roi);
         h = figure;
         if length(size(imcell)) == 2 % grayscale

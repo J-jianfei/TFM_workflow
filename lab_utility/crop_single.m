@@ -40,12 +40,18 @@ disp("Select ROI, press enter to confirm selection");
 sv = sliceViewer(imcell,'Parent',h);
 
 count = 1;
+
+
+
 while true
     [roi,~,err,roiObj] = waitROISelection('rect','return','backspace',h);
 
     if(~isempty(roi) && err == 0)
         framesToCrop = askCroppingFrames();
         imbead_cropped = crop_stack(imbead,roi,framesToCrop);
+
+        drift = computeDrift(imbead_cropped,1);
+        imbead_cropped = translateImgStack(imbead_cropped,drift);
         
         h2 = figure;
         sv2 = sliceViewer(imbead_cropped,"Parent",h2);
@@ -63,6 +69,13 @@ while true
         fullname_noext = fullname(1:strfind(fullname,'.tif')-1);
         if(~exist(fullname_noext,'dir'))
             mkdir(fullname_noext);
+        else
+            dirs = dir(fullname_noext);
+            for i = 1:length(dirs)
+                if(~isempty(strfind(dirs(i).name,"Cell_")))
+                    count = count + 1;
+                end
+            end
         end
         savefolder = fullfile([fullname_noext,'/Cell_',num2str(count)]);
         if(~exist(savefolder,'dir'))
