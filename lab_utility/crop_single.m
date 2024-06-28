@@ -71,10 +71,13 @@ while true
             mkdir(fullname_noext);
         else
             dirs = dir(fullname_noext);
-            for i = 1:length(dirs)
-                if(~isempty(strfind(dirs(i).name,"Cell_")))
-                    count = count + 1;
-                end
+            strs = {dirs(:).name};
+            pattern = "Cell_(\d+)";
+            numberStr = regexp(strs,pattern,'tokens');
+            cellids = arrayfun(@(x) str2double(x{1}{1}), numberStr(~arrayfun(@(x) isempty(x{1}),numberStr)));
+            maxid = max(cellids);
+            if(~isempty(maxid))
+                count = maxid + 1;
             end
         end
         savefolder = fullfile([fullname_noext,'/Cell_',num2str(count)]);
@@ -90,7 +93,7 @@ while true
         end
 
         save(fullfile([savefolder,'/ROI_',num2str(count),'.mat']),'roi','framesToCrop');
-        count = count + 1;
+        %count = count + 1;
         answer = questdlg('A new ROI selection in the same file?','Proceed or not','Yes','No','Yes');
         switch answer
             case 'Yes'

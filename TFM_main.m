@@ -63,6 +63,7 @@ while true
             nframes = size(imstack,3);
             ncols = size(imstack,2);
             nrows = size(imstack,1);
+
             continue;
         case 'correctDrift'
             [imstack_aligned,roi_driftcorrection,...
@@ -314,14 +315,7 @@ end
             roi = [];
             return;
         end
-        nrows = size(imstack,1);
-        ncols = size(imstack,2);
-        nframes = size(imstack,3);
-        % normalize the brightness
-        for iframe = 1:nframes
-            imstacktmp(:,:,iframe) = imadjust(mat2gray(imstack(:,:,iframe)));
-        end
-
+        
         % Ask for user inputs
         prompt = {'Enter the reference number:'};
         dlgtitle = 'Which frame is the reference for drift correction';
@@ -337,7 +331,9 @@ end
         % Process the user inputs
         refNumber = str2double(userInputs{1});
         
-        
+        for iframe = 1:nframes
+            imstacktmp(:,:,iframe) = imadjust(mat2gray(imstack(:,:,iframe)));
+        end
 
 
         % enable drawing in a preview window
