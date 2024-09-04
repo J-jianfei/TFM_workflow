@@ -213,7 +213,7 @@ end
         dlgtitle = 'Does the image stack fulfill the requirements? (1 for yes, 0 for no)';
         dims = [1 100];
         if nargin == 0 || isempty(defaultImgCondition)
-            default = {'1', '1','1','1'};
+            default = {'0', '0','0','0'};
         else
             default = defaultImgCondition;
         end
