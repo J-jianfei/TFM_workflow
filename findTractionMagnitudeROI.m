@@ -54,7 +54,7 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
     'Specify the frame number for which you want to find the traction magnitudes (0 for finding the magnitudes over all frames)'};
     dims = [1 50];
 
-    userInput = inputdlg(prompt,'Please specify settings to find maximum traction magnitude',dims,{'Regularized','1','0'});
+    userInput = inputdlg(prompt,'Please specify settings to find maximum traction magnitude',dims,{'Bayesian','1','0'});
 
     method = userInput{1};
     j = str2double(userInput{2});

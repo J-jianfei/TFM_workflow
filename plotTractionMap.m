@@ -1,4 +1,4 @@
-function h = plotTractionMap(TFM_results,varargin)
+function [h,varargout] = plotTractionMap(TFM_results,varargin)
     % Plot the traction map
     % 
     % Usage:
@@ -62,9 +62,15 @@ function h = plotTractionMap(TFM_results,varargin)
             % Convert x and y to mesh grids
             fn = TFM_results(i).traction_magnitude;
     [X, Y] = meshgrid(min(x):meshsize:max(x), min(y):meshsize:max(y));
-
+    
     % Interpolate traction values onto mesh grid
     Tn = griddata(x, y, fn, X, Y, 'cubic');
+    if nargout == 4
+        varargout{1} = X;
+        varargout{2} = Y;
+        varargout{3} = Tn;
+    end
+    
         h = surf(X,Y,Tn);view(0,90);shading interp;
         colormap(p.Results.ColorMap);
         if p.Results.ColorBar
