@@ -1,3 +1,0 @@
-% SCRIPT OF SPATIAL RESOLUTION CORRECTION
-
-d = uigetdir();
