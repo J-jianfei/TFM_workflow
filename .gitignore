@@ -1,6 +1,3 @@
-/*
+*
 !*.m
-!/lib/*.m
-!/lib/**/*.m
-!/lab_utility/
-/lab_utility/*.tif
+!*/**

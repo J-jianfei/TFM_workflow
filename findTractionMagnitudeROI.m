@@ -88,7 +88,7 @@ function [traction_magnitude_selected,roi,energy,avg_energy_density,method,nfram
     elseif strcmpi(method,'Regularized') || strcmpi(method,'Reg') || strcmpi(method,'R')
         if (~isempty(TF_attempt.Regularized))
             TFM_results = TF_attempt.Regularized(j).TFM_results;
-            nframes = TFM_results;
+            nframes = numel(TFM_results);
             for frame = 1:length(TFM_results)
                 x1 = min(TFM_results(frame).pos(:,1));
                 y1 = min(TFM_results(frame).pos(:,2));
