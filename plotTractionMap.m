@@ -55,7 +55,6 @@ function [h,varargout] = plotTractionMap(TFM_results,varargin)
 
 
 
-
     % Plot the traction map
 
     if strcmp(p.Results.PlotType, 'magnitude')
