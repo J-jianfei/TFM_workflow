@@ -83,8 +83,8 @@ alpha_opt = fminbnd(@minus_logevidence,alpha1,alpha2);
         [~,~,~,~,Ftfx, Ftfy] = reg_fourier_TFM(Ftux,Ftuy,LL,E,s,cluster_size,i_max, j_max);
         fxx = reshape(Ftfx,i_max*j_max,1);    
         fyy = reshape(Ftfy,i_max*j_max,1);
-        f(1:2:size(fxx)*2,1) = fxx;
-        f(2:2:size(fyy)*2,1) = fyy;
+        f(1:2:size(fxx,1)*2,1) = fxx;
+        f(2:2:size(fyy,1)*2,1) = fyy;
 
          A = alpha*sparse(C_a) + BX_a;
          L = chol(sparse(A));

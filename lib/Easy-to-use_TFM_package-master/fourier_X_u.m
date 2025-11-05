@@ -92,7 +92,7 @@ function [grid_mat,i_max,j_max, X,fuu,Ftux,Ftuy,u] = fourier_X_u(Orig_pos,vec, m
   fux1=reshape(Ftux, i_max*j_max,1);
   fuy1=reshape(Ftuy, i_max*j_max,1);
 
-  fuu(1:2:size(fux1)*2,1) = fux1;
-  fuu(2:2:size(fuy1)*2,1) = fuy1;
+  fuu(1:2:size(fux1,1)*2,1) = fux1;
+  fuu(2:2:size(fuy1,1)*2,1) = fuy1;
   
 end

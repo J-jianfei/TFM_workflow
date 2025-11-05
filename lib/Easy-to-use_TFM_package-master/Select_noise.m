@@ -88,6 +88,7 @@ end
 quiver(handles.data.displacement(frame).pos(:,1),handles.data.displacement(frame).pos(:,2),...
     handles.data.displacement(frame).vec(:,1),handles.data.displacement(frame).vec(:,2),'r');
 set(gca, 'DataAspectRatio', [1,1,50],'YDir','reverse','XTick',[],'YTick',[])
+pause(0.5)
 hold off;
 
 handles.output = hObject;
